@@ -1,0 +1,3 @@
+@echo off 
+echo Starting wallet backend... 
+go run cmd/main.go 

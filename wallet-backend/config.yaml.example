@@ -1,0 +1,45 @@
+# 钱包后端配置文件示例
+# 复制此文件为 config.yaml 并修改相应配置
+
+database:
+  host: "localhost"
+  port: "3306"
+  username: "root"
+  password: "password"
+  database: "wallet_db"
+  charset: "utf8mb4"
+
+ethereum:
+  testnet:
+    rpc_url: "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID"
+    chain_id: 11155111
+    confirmations: 12
+  mainnet:
+    rpc_url: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"
+    chain_id: 1
+    confirmations: 12
+
+wallet:
+  hd_wallet:
+    mnemonic: "your twelve word mnemonic phrase here for testing purposes only"
+    derivation_path: "m/44'/60'/0'/0"
+  hot_wallet:
+    max_balance: "1.0"
+    collection_threshold: "0.1"
+  cold_wallet:
+    address: "0x0000000000000000000000000000000000000000"
+
+scanner:
+  scan_interval: 15
+  max_blocks_per_scan: 100
+  retry_attempts: 3
+
+server:
+  port: "8080"
+  host: "0.0.0.0"
+  read_timeout: 30
+  write_timeout: 30
+
+jwt:
+  secret: "your-secret-key-here-change-in-production"
+  expiration_hours: 24 

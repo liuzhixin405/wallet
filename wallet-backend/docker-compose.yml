@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: wallet-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: wallet_db
+      MYSQL_USER: wallet
+      MYSQL_PASSWORD: wallet123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - wallet-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis缓存（可选）
+  redis:
+    image: redis:7-alpine
+    container_name: wallet-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - wallet-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 20s
+      retries: 10
+
+  # 钱包后端服务
+  wallet-backend:
+    build: .
+    container_name: wallet-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - WALLET_DATABASE_HOST=mysql
+      - WALLET_DATABASE_PORT=3306
+      - WALLET_DATABASE_USERNAME=wallet
+      - WALLET_DATABASE_PASSWORD=wallet123
+      - WALLET_DATABASE_DATABASE=wallet_db
+      - WALLET_JWT_SECRET=your-secret-key-here-change-in-production
+      - WALLET_ETHEREUM_TESTNET_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID
+      - WALLET_ETHEREUM_MAINNET_RPC_URL=https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - wallet-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      timeout: 30s
+      retries: 3
+      start_period: 40s
+
+  # Nginx反向代理（可选）
+  nginx:
+    image: nginx:alpine
+    container_name: wallet-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - wallet-backend
+    networks:
+      - wallet-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  wallet-network:
+    driver: bridge 
