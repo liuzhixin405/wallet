@@ -3,7 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Login from './components/Login';
+import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import Addresses from './components/Addresses';
+import Withdraw from './components/Withdraw';
+import Deposits from './components/Deposits';
+import Transactions from './components/Transactions';
+import Tools from './components/Tools';
 
 const theme = createTheme({
   palette: {
@@ -30,6 +36,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
             element={
@@ -38,7 +45,47 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route
+            path="/addresses"
+            element={
+              <PrivateRoute>
+                <Addresses />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/withdraw"
+            element={
+              <PrivateRoute>
+                <Withdraw />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/deposits"
+            element={
+              <PrivateRoute>
+                <Deposits />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/transactions"
+            element={
+              <PrivateRoute>
+                <Transactions />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/tools"
+            element={
+              <PrivateRoute>
+                <Tools />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
     </ThemeProvider>

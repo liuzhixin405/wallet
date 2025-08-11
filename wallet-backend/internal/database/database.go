@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"log"
-	"time"
 	"wallet-backend/internal/config"
 	"wallet-backend/internal/models"
 
@@ -44,10 +43,9 @@ func GetDB() *gorm.DB {
 	return DB
 }
 
-// AutoMigrate 自动迁移数据库表
+// AutoMigrate 自动迁移数据库表结构
 func AutoMigrate() error {
-	log.Println("Starting database migration...")
-
+	// 自动迁移所有模型
 	err := DB.AutoMigrate(
 		&models.User{},
 		&models.AddressLibrary{},
@@ -57,9 +55,8 @@ func AutoMigrate() error {
 		&models.ChainBill{},
 		&models.CurrencyChainConfig{},
 	)
-
 	if err != nil {
-		return fmt.Errorf("failed to migrate database: %v", err)
+		return fmt.Errorf("failed to auto migrate: %v", err)
 	}
 
 	log.Println("Database migration completed successfully")
@@ -68,49 +65,88 @@ func AutoMigrate() error {
 
 // CreateDefaultData 创建默认数据
 func CreateDefaultData() error {
-	log.Println("Creating default data...")
+	// 创建默认币种配置
+	if err := createDefaultCurrencies(); err != nil {
+		return fmt.Errorf("failed to create default currencies: %v", err)
+	}
 
-	// 创建默认货币配置
+	return nil
+}
+
+// createDefaultCurrencies 创建默认币种配置
+func createDefaultCurrencies() error {
+	// 检查是否已存在币种配置
+	var count int64
+	DB.Model(&models.CurrencyChainConfig{}).Count(&count)
+	if count > 0 {
+		return nil // 已存在配置，跳过
+	}
+
+	// 创建默认币种配置
 	defaultCurrencies := []models.CurrencyChainConfig{
 		{
-			CurrencySymbol: "ETH",
-			ChainType:      "Ethereum",
-			Protocol:       nil,
-			Decimals:       18,
-			MinWithdraw:    0.001,
-			MaxWithdraw:    100.0,
-			WithdrawFee:    0.001,
-			DepositFee:     0.0,
-			Status:         true,
-			CreatedTime:    time.Now(),
+			Symbol:            "ETH",
+			ChainType:         "Ethereum",
+			IsEnabled:         true,
+			RPCURL:            "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+			ChainID:           11155111,
+			Confirmations:     12,
+			Decimals:          18,
+			CollectionEnabled: true,
+			CollectionThreshold: "0.1",
 		},
 		{
-			CurrencySymbol: "BTC",
-			ChainType:      "Bitcoin",
-			Protocol:       nil,
-			Decimals:       8,
-			MinWithdraw:    0.0001,
-			MaxWithdraw:    10.0,
-			WithdrawFee:    0.0001,
-			DepositFee:     0.0,
-			Status:         true,
-			CreatedTime:    time.Now(),
+			Symbol:            "USDT",
+			ChainType:         "Ethereum",
+			IsEnabled:         true,
+			RPCURL:            "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+			ChainID:           11155111,
+			Confirmations:     12,
+			Decimals:          6,
+			CollectionEnabled: true,
+			CollectionThreshold: "10",
+		},
+		{
+			Symbol:            "USDC",
+			ChainType:         "Ethereum",
+			IsEnabled:         true,
+			RPCURL:            "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+			ChainID:           11155111,
+			Confirmations:     12,
+			Decimals:          6,
+			CollectionEnabled: true,
+			CollectionThreshold: "10",
+		},
+		{
+			Symbol:            "BNB",
+			ChainType:         "BSC",
+			IsEnabled:         true,
+			RPCURL:            "https://bsc-dataseed1.binance.org/",
+			ChainID:           56,
+			Confirmations:     15,
+			Decimals:          18,
+			CollectionEnabled: true,
+			CollectionThreshold: "0.1",
+		},
+		{
+			Symbol:            "BUSD",
+			ChainType:         "BSC",
+			IsEnabled:         true,
+			RPCURL:            "https://bsc-dataseed1.binance.org/",
+			ChainID:           56,
+			Confirmations:     15,
+			Decimals:          18,
+			CollectionEnabled: true,
+			CollectionThreshold: "10",
 		},
 	}
 
 	for _, currency := range defaultCurrencies {
-		var existing models.CurrencyChainConfig
-		if err := DB.Where("currency_symbol = ? AND chain_type = ?", currency.CurrencySymbol, currency.ChainType).First(&existing).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				if err := DB.Create(&currency).Error; err != nil {
-					log.Printf("Failed to create default currency %s: %v", currency.CurrencySymbol, err)
-				} else {
-					log.Printf("Created default currency: %s", currency.CurrencySymbol)
-				}
-			}
+		if err := DB.Create(&currency).Error; err != nil {
+			return fmt.Errorf("failed to create currency %s: %v", currency.Symbol, err)
 		}
 	}
 
-	log.Println("Default data creation completed")
+	log.Println("Default currencies created successfully")
 	return nil
 }

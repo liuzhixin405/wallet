@@ -13,7 +13,7 @@ func GetDeposits(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 
 	var deposits []models.DepositRecord
-	if err := database.GetDB().Where("userid = ?", userID).Order("created_time DESC").Find(&deposits).Error; err != nil {
+	if err := database.GetDB().Where("user_id = ?", userID).Order("created_time DESC").Find(&deposits).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch deposits"})
 		return
 	}
@@ -27,7 +27,7 @@ func GetDepositByID(c *gin.Context) {
 	depositID := c.Param("id")
 
 	var deposit models.DepositRecord
-	if err := database.GetDB().Where("id = ? AND userid = ?", depositID, userID).First(&deposit).Error; err != nil {
+	if err := database.GetDB().Where("id = ? AND user_id = ?", depositID, userID).First(&deposit).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Deposit record not found"})
 		return
 	}
@@ -41,7 +41,7 @@ func GetDepositsByAddress(c *gin.Context) {
 	address := c.Param("address")
 
 	var deposits []models.DepositRecord
-	if err := database.GetDB().Where("userid = ? AND to_address = ?", userID, address).Order("created_time DESC").Find(&deposits).Error; err != nil {
+	if err := database.GetDB().Where("user_id = ? AND to_address = ?", userID, address).Order("created_time DESC").Find(&deposits).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch deposits"})
 		return
 	}

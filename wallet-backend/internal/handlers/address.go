@@ -15,7 +15,7 @@ func GetAddresses(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 
 	var addresses []models.AddressLibrary
-	if err := database.GetDB().Where("userid = ?", userID).Find(&addresses).Error; err != nil {
+	if err := database.GetDB().Where("user_id = ?", userID).Find(&addresses).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch addresses"})
 		return
 	}

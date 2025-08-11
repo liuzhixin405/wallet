@@ -13,7 +13,7 @@ func GetBalances(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 
 	var balances []models.Balance
-	if err := database.GetDB().Where("address IN (SELECT address FROM address_library WHERE userid = ?)", userID).Find(&balances).Error; err != nil {
+	if err := database.GetDB().Where("address IN (SELECT address FROM address_library WHERE user_id = ?)", userID).Find(&balances).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch balances"})
 		return
 	}
@@ -27,7 +27,7 @@ func GetBalanceByCurrency(c *gin.Context) {
 	currencySymbol := c.Param("currency")
 	chainType := c.Query("chain_type")
 
-	query := database.GetDB().Where("address IN (SELECT address FROM address_library WHERE userid = ?)", userID)
+	query := database.GetDB().Where("address IN (SELECT address FROM address_library WHERE user_id = ?)", userID)
 	if currencySymbol != "" {
 		query = query.Where("currency_symbol = ?", currencySymbol)
 	}

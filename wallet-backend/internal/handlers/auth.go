@@ -5,6 +5,7 @@ import (
 	"time"
 	"wallet-backend/internal/database"
 	"wallet-backend/internal/models"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -58,7 +59,13 @@ func Login(c *gin.Context) {
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // 暂时硬编码24小时
 	})
 
-	tokenString, err := token.SignedString([]byte("your-secret-key")) // 暂时硬编码密钥
+	// 使用与中间件一致的密钥来源
+	jwtSecret := os.Getenv("WALLET_JWT_SECRET")
+	if jwtSecret == "" {
+		jwtSecret = "your-secret-key-here-change-in-production"
+	}
+
+	tokenString, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return

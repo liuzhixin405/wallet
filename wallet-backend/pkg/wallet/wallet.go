@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"wallet-backend/internal/models"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -66,7 +67,7 @@ func (ew *EthereumWallet) ValidateAddress(address string) bool {
 	}
 
 	// 检查地址格式
-	_, err := crypto.HexToAddress(address)
+	_, err := common.HexToAddress(address)
 	return err == nil
 }
 

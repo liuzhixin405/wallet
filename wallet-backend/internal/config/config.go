@@ -7,10 +7,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Config 应用配置结构
+// Config 配置结构
 type Config struct {
 	Database DatabaseConfig `mapstructure:"database"`
 	Ethereum EthereumConfig `mapstructure:"ethereum"`
+	BSC      *BSCConfig     `mapstructure:"bsc"`
 	Wallet   WalletConfig   `mapstructure:"wallet"`
 	Scanner  ScannerConfig  `mapstructure:"scanner"`
 	Server   ServerConfig   `mapstructure:"server"`
@@ -29,8 +30,29 @@ type DatabaseConfig struct {
 
 // EthereumConfig 以太坊配置
 type EthereumConfig struct {
-	Testnet NetworkConfig `mapstructure:"testnet"`
-	Mainnet NetworkConfig `mapstructure:"mainnet"`
+	Testnet TestnetConfig `mapstructure:"testnet"`
+	Mainnet MainnetConfig `mapstructure:"mainnet"`
+}
+
+// BSCConfig BSC配置
+type BSCConfig struct {
+	RPCURL       string `mapstructure:"rpc_url"`
+	ChainID      int64  `mapstructure:"chain_id"`
+	Confirmations int   `mapstructure:"confirmations"`
+}
+
+// TestnetConfig 测试网配置
+type TestnetConfig struct {
+	RPCURL       string `mapstructure:"rpc_url"`
+	ChainID      int64  `mapstructure:"chain_id"`
+	Confirmations int   `mapstructure:"confirmations"`
+}
+
+// MainnetConfig 主网配置
+type MainnetConfig struct {
+	RPCURL        string `mapstructure:"rpc_url"`
+	ChainID       int64  `mapstructure:"chain_id"`
+	Confirmations int    `mapstructure:"confirmations"`
 }
 
 // NetworkConfig 网络配置

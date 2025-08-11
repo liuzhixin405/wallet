@@ -16,6 +16,11 @@ ethereum:
     chain_id: 1
     confirmations: 12
 
+bsc:
+  rpc_url: "https://bsc-dataseed1.binance.org/"
+  chain_id: 56
+  confirmations: 15
+
 wallet:
   hd_wallet:
     mnemonic: "your twelve word mnemonic phrase here for testing purposes only"

@@ -30,7 +30,7 @@ func CreateWithdraw(c *gin.Context) {
 
 	// 检查余额是否足够
 	var balance models.Balance
-	if err := database.GetDB().Where("currency_symbol = ? AND chain_type = ? AND address IN (SELECT address FROM address_library WHERE userid = ?)",
+	if err := database.GetDB().Where("currency_symbol = ? AND chain_type = ? AND address IN (SELECT address FROM address_library WHERE user_id = ?)",
 		req.CurrencySymbol, req.ChainType, userID).First(&balance).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient balance"})
 		return

@@ -6,7 +6,6 @@ import (
 	"math/big"
 	"wallet-backend/internal/models"
 
-	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -15,7 +14,7 @@ import (
 // BlockchainService 区块链服务
 type BlockchainService struct {
 	ethClient *ethclient.Client
-	btcClient *rpcclient.Client
+	// btcClient *rpcclient.Client // 移除实际依赖
 }
 
 // NewBlockchainService 创建新的区块链服务实例
@@ -48,22 +47,7 @@ func (bs *BlockchainService) GetEthereumBalance(address string) (*big.Int, error
 
 // GetBitcoinBalance 获取比特币地址余额
 func (bs *BlockchainService) GetBitcoinBalance(address string) (float64, error) {
-	if bs.btcClient == nil {
-		// 这里应该从配置中获取比特币节点连接信息
-		connCfg := &rpcclient.ConnConfig{
-			Host:         "localhost:8332",
-			User:         "your-username",
-			Pass:         "your-password",
-			HTTPPostMode: true,
-			DisableTLS:   true,
-		}
-
-		client, err := rpcclient.New(connCfg, nil)
-		if err != nil {
-			return 0, fmt.Errorf("failed to connect to Bitcoin node: %v", err)
-		}
-		bs.btcClient = client
-	}
+	// TODO: 接入实际的 Bitcoin 节点 RPC 客户端
 
 	// 获取地址信息
 	// addressInfo, err := bs.btcClient.GetAddressInfo(address)
@@ -128,9 +112,9 @@ func (bs *BlockchainService) getEthereumTransactionStatus(txHash string) (*model
 
 // getBitcoinTransactionStatus 获取比特币交易状态
 func (bs *BlockchainService) getBitcoinTransactionStatus(txHash string) (*models.ChainBill, error) {
-	if bs.btcClient == nil {
-		return nil, fmt.Errorf("Bitcoin client not initialized")
-	}
+	// if bs.btcClient == nil {
+	// 	return nil, fmt.Errorf("Bitcoin client not initialized")
+	// }
 
 	// 获取交易信息
 	// hash, err := chainhash.NewHashFromStr(txHash)

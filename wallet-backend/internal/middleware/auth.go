@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -46,13 +47,45 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 从token中获取用户信息
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			userID, exists := claims["user_id"]
+			rawUserID, exists := claims["user_id"]
 			if !exists {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
 				c.Abort()
 				return
 			}
-			c.Set("user_id", userID)
+
+			// 规范化 user_id 为 uint64
+			var userIDUint uint64
+			switch v := rawUserID.(type) {
+			case float64:
+				userIDUint = uint64(v)
+			case int:
+				userIDUint = uint64(v)
+			case int32:
+				userIDUint = uint64(v)
+			case int64:
+				userIDUint = uint64(v)
+			case uint:
+				userIDUint = uint64(v)
+			case uint32:
+				userIDUint = uint64(v)
+			case uint64:
+				userIDUint = v
+			case string:
+				if parsed, perr := strconv.ParseUint(v, 10, 64); perr == nil {
+					userIDUint = parsed
+				} else {
+					c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token user_id"})
+					c.Abort()
+					return
+				}
+			default:
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token user_id type"})
+				c.Abort()
+				return
+			}
+
+			c.Set("user_id", userIDUint)
 		}
 
 		c.Next()

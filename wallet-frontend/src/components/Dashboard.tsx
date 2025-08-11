@@ -9,8 +9,10 @@ import {
   Button,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   Divider,
+  ListItemIcon,
 } from '@mui/material';
 import {
   AccountBalance,
@@ -18,9 +20,10 @@ import {
   Send,
   Receipt,
   History,
+  Build,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import apiService from '../services/api';
+import { apiService } from '../services/apiService';
 
 interface Balance {
   currency_symbol: string;
@@ -34,6 +37,7 @@ const Dashboard: React.FC = () => {
   const [balances, setBalances] = useState<Balance[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     loadBalances();
@@ -55,6 +59,8 @@ const Dashboard: React.FC = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
+
+  // 快捷操作已移到 Tools 页面
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -116,24 +122,64 @@ const Dashboard: React.FC = () => {
               Quick Actions
             </Typography>
             <List>
-              <ListItem onClick={() => navigate('/addresses')} sx={{ cursor: 'pointer' }}>
-                <AccountBalanceWallet sx={{ mr: 2 }} />
-                <ListItemText primary="Manage Addresses" />
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => navigate('/addresses')} sx={{ cursor: 'pointer' }}>
+                  <AccountBalanceWallet sx={{ mr: 2 }} />
+                  <ListItemText primary="Manage Addresses" />
+                </ListItemButton>
               </ListItem>
               <Divider />
-              <ListItem onClick={() => navigate('/withdraw')} sx={{ cursor: 'pointer' }}>
-                <Send sx={{ mr: 2 }} />
-                <ListItemText primary="Withdraw" />
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => navigate('/withdraw')} sx={{ cursor: 'pointer' }}>
+                  <Send sx={{ mr: 2 }} />
+                  <ListItemText primary="Withdraw" />
+                </ListItemButton>
               </ListItem>
               <Divider />
-              <ListItem onClick={() => navigate('/deposits')} sx={{ cursor: 'pointer' }}>
-                <Receipt sx={{ mr: 2 }} />
-                <ListItemText primary="Deposit History" />
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => navigate('/deposits')} sx={{ cursor: 'pointer' }}>
+                  <Receipt sx={{ mr: 2 }} />
+                  <ListItemText primary="Deposit History" />
+                </ListItemButton>
               </ListItem>
               <Divider />
-              <ListItem onClick={() => navigate('/transactions')} sx={{ cursor: 'pointer' }}>
-                <History sx={{ mr: 2 }} />
-                <ListItemText primary="Transaction History" />
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => navigate('/transactions')} sx={{ cursor: 'pointer' }}>
+                  <History sx={{ mr: 2 }} />
+                  <ListItemText primary="Transaction History" />
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => navigate('/tools')} sx={{ cursor: 'pointer' }}>
+                  <Send sx={{ mr: 2 }} />
+                  <ListItemText primary="手动归集 (Trigger Collection)" />
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => navigate('/tools')} sx={{ cursor: 'pointer' }}>
+                  <Receipt sx={{ mr: 2 }} />
+                  <ListItemText primary="手动扫区块 (Scan Block Once)" />
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => navigate('/transactions')}>
+                <ListItemIcon>
+                  <Receipt />
+                </ListItemIcon>
+                <ListItemText primary="交易记录 (Transactions)" />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => navigate('/tools')}>
+                <ListItemIcon>
+                  <Build />
+                </ListItemIcon>
+                <ListItemText primary="工具管理 (Tools)" />
+                </ListItemButton>
               </ListItem>
             </List>
           </Paper>

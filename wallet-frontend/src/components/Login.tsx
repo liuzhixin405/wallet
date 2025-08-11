@@ -104,9 +104,9 @@ const Login: React.FC = () => {
             </Button>
           </Box>
 
-          <Typography variant="body2" sx={{ mt: 2 }}>
-            Demo credentials: admin / password
-          </Typography>
+          <Button variant="text" onClick={() => navigate('/register')}>
+            Create an account
+          </Button>
         </Paper>
       </Box>
     </Container>
